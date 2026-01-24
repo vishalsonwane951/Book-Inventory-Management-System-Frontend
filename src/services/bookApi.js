@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URI = process.env.API_URL
+const API_URI = import.meta.env.VITE_API_URL;
 
 export const getAllBooks = () => axios.get(`${API_URI}/allbooks`);
 export const getBookById = (id) => axios.get(`${API_URI}/books/${id}`);
