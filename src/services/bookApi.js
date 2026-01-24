@@ -1,9 +1,7 @@
-import axios from "axios";
+import api from "./api";
 
-const API_URI = import.meta.env.VITE_API_URL;
-
-export const getAllBooks = () => axios.get(`${API_URI}/allbooks`);
-export const getBookById = (id) => axios.get(`${API_URI}/books/${id}`);
-export const addBook = (data) => axios.post(`${API_URI}/createbook`, data);
-export const updateBook = (id, data) => axios.put(`${API_URI}/update-book/${id}`, data);
-export const deleteBook = (id) => axios.delete(`${API_URI}/delete-book/${id}`);
+export const getAllBooks = () => api.get(`${API_URI}/allbooks`);
+export const getBookById = (id) => api.get(`${API_URI}/books/${id}`);
+export const addBook = (data) => api.post(`${API_URI}/createbook`, data);
+export const updateBook = (id, data) => api.put(`${API_URI}/update-book/${id}`, data);
+export const deleteBook = (id) => api.delete(`${API_URI}/delete-book/${id}`);
