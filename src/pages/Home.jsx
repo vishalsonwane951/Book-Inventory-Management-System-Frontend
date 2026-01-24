@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react"
-import { getAllBooks, deleteBook } from "../services/bookApi";
+import {  deleteBook } from "../services/bookApi";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import api from "../services/api";
 
 import "../styles/main.css";
 
@@ -17,15 +19,19 @@ const Home = () => {
   }, []);
 
   const fetchBooks = async () => {
-    try {
-      const res = await getAllBooks();
-      setBook(res.data);
-    } catch (error) {
-      console.error("Error fetching books", error);
-    } finally {
-      setLoading(false);
-    }
+  try {
+    const res = await api.get('/allbook')
+    console.log("API DATA:", res.data);
+
+    setBook(res.data)
+  } catch (error) {
+    console.error("Error fetching books", error);
+    setBook([]);
+  } finally {
+    setLoading(false);
   }
+};
+
 
   const handleDelete = async (id) => {
   const confirmDelete = window.confirm(
@@ -36,7 +42,7 @@ const Home = () => {
 
   try {
     await deleteBook(id);
-    fetchBooks(); // refresh list
+    fetchBooks(); 
   } catch (error) {
     console.error("Error deleting book:", error);
     alert("Failed to delete book. Please try again.");
@@ -45,11 +51,13 @@ const Home = () => {
 
 
 
-  const filteredBooks = book.filter(
-    (b) =>
-      b.title.toLowerCase().includes(search.toLowerCase()) ||
-      b.author.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredBooks = Array.isArray(book)
+  ? book.filter((b) =>
+      b.title?.toLowerCase().includes(search.toLowerCase()) ||
+      b.author?.toLowerCase().includes(search.toLowerCase())
+    )
+  : [];
+
 
   const [currentPage, setCurrentPage] = useState(1);
   const booksPerPage = 10;
@@ -76,7 +84,6 @@ const Home = () => {
             </Link>
           </div>
 
-          {/* Search and Filter Section */}
           <div className="card shadow-sm mb-4">
             <div className="card-body">
               <div className="row g-3 align-items-end">
@@ -113,7 +120,6 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Books Table Section */}
       <div className="row">
         <div className="col-12">
           <div className="card shadow-sm">
@@ -127,7 +133,6 @@ const Home = () => {
                 </div>
               ) : (
                 <>
-                  {/* Responsive Table Container */}
                   <div className="table-responsive">
                     <table className="table table-hover mb-0">
                       <thead className="table-primary">
@@ -233,7 +238,6 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Mobile Summary (for small screens) */}
       <div className="row mt-3 d-md-none">
         <div className="col-12">
           <div className="card bg-light">
