@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react"
-import {  deleteBook } from "../services/bookApi";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import api from "../services/api";
 
 import "../styles/main.css";
