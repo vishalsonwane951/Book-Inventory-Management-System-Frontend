@@ -39,7 +39,7 @@ const Home = () => {
   if (!confirmDelete) return;
 
   try {
-    await deleteBook(id);
+     await api.delete(`/delete-book/${id}`);
     fetchBooks(); 
   } catch (error) {
     console.error("Error deleting book:", error);
@@ -88,9 +88,6 @@ const Home = () => {
                 <div className="col-12 col-md-8 col-lg-6">
                   <label htmlFor="searchInput" className="form-label fw-semibold">Search Books</label>
                   <div className="input-group">
-                    <span className="input-group-text">
-                      <i className="bi bi-search"></i>
-                    </span>
                     <input
                       id="searchInput"
                       type="text"
@@ -102,7 +99,7 @@ const Home = () => {
                   </div>
                 </div>
 
-                <div className="col-12 col-md-4 col-lg-3">
+                <div className="col-12 col-md-4 col-lg-1">
                   <div className="d-grid">
                     <button
                       className="btn btn-outline-secondary"

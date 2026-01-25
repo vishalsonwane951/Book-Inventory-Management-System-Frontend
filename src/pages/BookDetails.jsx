@@ -1,27 +1,28 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-
-import axios from "axios";
+import api from "../services/api";
 
 const BoockDetails = () => {
     const { id } = useParams();
     const [book, setBook] = useState(null);
     const [loading, setLoading] = useState(true);
 
+  
+
+   const fetchBookDetails = async () => {
+    try {
+      const res = await api.get(`/books/${id}`); // call backend directly
+      setBook(res.data); // store book in state
+    } catch (error) {
+      console.error("Error fetching book details", error);
+    } finally {
+      setLoading(false);
+    }
+  };
     useEffect(() => {
-        fetchBoockDetails();
+        fetchBookDetails();
     },[id]);
 
-    const fetchBoockDetails = async () => {
-        try  {
-             const res = await getBookById(id);
-            setBook(res.data);
-            } catch (error) {
-            console.error('Error fetching Book Details',error);
-        }  finally {
-            setLoading(false);
-        }
-    };
 
     if (loading) {
         return <p style={{ padding:'20px', alignContent:'center'}}>Loading....</p>;

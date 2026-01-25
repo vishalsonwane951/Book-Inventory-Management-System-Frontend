@@ -18,13 +18,32 @@ const AddEditBook = () => {
   const [error, setError] = useState({});
 
 
+  // useEffect(() => {
+  //   if (id) {
+  //     api.get(`/books/${id}`).then((res) => {
+  //       setFormData(res.data);
+  //     });
+  //   }
+  // }, [id]);
+
   useEffect(() => {
     if (id) {
       api.get(`/books/${id}`).then((res) => {
-        setFormData(res.data);
+        const book = res.data;
+
+        // Convert publishDate to YYYY-MM-DD for the date input
+        const formattedDate = book.publishDate
+          ? new Date(book.publishDate).toISOString().split("T")[0]
+          : "";
+
+        setFormData({
+          ...book,
+          publishDate: formattedDate,
+        });
       });
     }
   }, [id]);
+
 
 
   const validate = () => {
@@ -46,7 +65,7 @@ const AddEditBook = () => {
       error.publishDate = "Publish Date is required";
     }
 
-    setError(error); 
+    setError(error);
 
     return Object.keys(error).length === 0;
   };
@@ -57,18 +76,24 @@ const AddEditBook = () => {
     if (!validate()) return;
 
     try {
+      // Convert publishDate to proper Date object before sending
+      const payload = {
+        ...formdata,
+        publishDate: formdata.publishDate ? new Date(formdata.publishDate) : null,
+      };
+
       if (id) {
-        await api.put(`/update-book/${id}`, formdata);
+        await api.put(`/update-book/${id}`, payload); // send updated book
       } else {
-        await api.post('/createbook', formdata);
+        await api.post('/createbook', payload); // create new book
       }
 
       navigate('/');
     } catch (error) {
       console.error("Submit error:", error);
-    } finally {
     }
   };
+
 
   return (
     <div className="container py-4">
@@ -131,9 +156,12 @@ const AddEditBook = () => {
                   id="publishDate"
                   type="date"
                   className={`form-control ${error.publishDate ? 'is-invalid' : ''}`}
-                  value={formdata.publishDate}
-                  onChange={(e) => setFormData({ ...formdata, publishDate: e.target.value })}
+                  value={formdata.publishDate?.split("T")[0]}
+                  onChange={(e) =>
+                    setFormData({ ...formdata, publishDate: e.target.value })
+                  }
                 />
+
                 {error.publishDate && <div className="invalid-feedback">{error.publishDate}</div>}
               </div>
 
