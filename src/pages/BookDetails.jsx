@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../services/api";
+import React from "react";
 
 const BoockDetails = () => {
     const { id } = useParams();
@@ -53,4 +54,4 @@ const BoockDetails = () => {
     );
 };
 
-export default BoockDetails;
+export default React.memo(BoockDetails);

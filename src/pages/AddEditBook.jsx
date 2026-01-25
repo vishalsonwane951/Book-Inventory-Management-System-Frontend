@@ -1,13 +1,14 @@
-import { use, useEffect, useState } from "react";
+import React, {useEffect, useCallback, useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../services/api";
+import { BookContext } from "../context/BookContext";
 
 const AddEditBook = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { fetchBooks } = useContext(BookContext); // 🔥 navbar auto-refresh
 
-
-  const [formdata, setFormData] = useState({
+  const [formData, setFormData] = useState({
     title: "",
     author: "",
     publisher: "",
@@ -15,84 +16,85 @@ const AddEditBook = () => {
     overview: "",
   });
 
-  const [error, setError] = useState({});
-
-
-  // useEffect(() => {
-  //   if (id) {
-  //     api.get(`/books/${id}`).then((res) => {
-  //       setFormData(res.data);
-  //     });
-  //   }
-  // }, [id]);
+  const [error, setErrors] = useState({});
 
   useEffect(() => {
-    if (id) {
-      api.get(`/books/${id}`).then((res) => {
-        const book = res.data;
+    if (!id) return;
 
-        // Convert publishDate to YYYY-MM-DD for the date input
-        const formattedDate = book.publishDate
-          ? new Date(book.publishDate).toISOString().split("T")[0]
-          : "";
+    const fetchBook = async () => {
+      try {
+        const res = await api.get(`/books/${id}`);
+        const book = res.data;
 
         setFormData({
           ...book,
-          publishDate: formattedDate,
+          publishDate: book.publishDate
+            ? new Date(book.publishDate).toISOString().split("T")[0]
+            : "",
         });
-      });
-    }
+      } catch (err) {
+        console.error("Fetch book error:", err);
+      }
+    };
+
+    fetchBook();
   }, [id]);
 
+  /* ================= INPUT HANDLER ================= */
+  const handleChange = useCallback((field, value) => {
+    const cleanValue =
+      field === "author"
+        ? value.replace(/[^a-zA-Z\s.]/g, "")
+        : value;
 
+    setFormData((prev) => ({
+      ...prev,
+      [field]: cleanValue,
+    }));
+  }, []);
 
-  const validate = () => {
-    const error = {};
+  /* ================= VALIDATION ================= */
+  const validate = useCallback(() => {
+    const newErrors = {};
 
-    if (!formdata.title?.trim()) {
-      error.title = "Title is required";
-    }
+    if (!formData.title.trim()) newErrors.title = "Title is required";
+    if (!formData.author.trim()) newErrors.author = "Author is required";
+    if (!formData.publisher.trim())
+      newErrors.publisher = "Publisher is required";
+    if (!formData.publishDate)
+      newErrors.publishDate = "Publish Date is required";
 
-    if (!formdata.author?.trim()) {
-      error.author = "Author is required";
-    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }, [formData]);
 
-    if (!formdata.publisher?.trim()) {
-      error.publisher = "Publisher is required";
-    }
+  /* ================= SUBMIT ================= */
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      if (!validate()) return;
 
-    if (!formdata.publishDate?.trim()) {
-      error.publishDate = "Publish Date is required";
-    }
+      try {
+        const payload = {
+          ...formData,
+          publishDate: new Date(formData.publishDate),
+        };
 
-    setError(error);
+        if (id) {
+          await api.put(`/update-book/${id}`, payload);
+        } else {
+          await api.post("/createbook", payload);
+        }
 
-    return Object.keys(error).length === 0;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!validate()) return;
-
-    try {
-      // Convert publishDate to proper Date object before sending
-      const payload = {
-        ...formdata,
-        publishDate: formdata.publishDate ? new Date(formdata.publishDate) : null,
-      };
-
-      if (id) {
-        await api.put(`/update-book/${id}`, payload); // send updated book
-      } else {
-        await api.post('/createbook', payload); // create new book
+        await fetchBooks(); // 🔥 refresh navbar count
+        navigate("/");
+      } catch (err) {
+        console.error("Submit error:", err);
       }
+    },
+    [formData, id, navigate, validate, fetchBooks]
+  );
 
-      navigate('/');
-    } catch (error) {
-      console.error("Submit error:", error);
-    }
-  };
 
 
   return (
@@ -112,11 +114,8 @@ const AddEditBook = () => {
                   type="text"
                   className={`form-control ${error.title ? "is-invalid" : ""}`}
                   placeholder="Enter book title"
-                  value={formdata.title}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setFormData({ ...formdata, title: value.replace(/[^a-zA-Z\s.]/g, ''), });
-                  }}
+                  value={formData.title}
+                  onChange={(e) => handleChange('title', e.target.value)}
                 />
 
                 {error.title && <div className="invalid-feedback">{error.title}</div>}
@@ -129,8 +128,8 @@ const AddEditBook = () => {
                   type="text"
                   className={`form-control ${error.author ? 'is-invalid' : ''}`}
                   placeholder="Enter author name"
-                  value={formdata.author}
-                  onChange={(e) => setFormData({ ...formdata, author: e.target.value.replace(/[^a-zA-Z\s.]/g, ''), })}
+                  value={formData.author}
+                  onChange={(e) => handleChange('author', e.target.value)}
                 />
                 {error.author && <div className="invalid-feedback">{error.author}</div>}
               </div>
@@ -142,10 +141,8 @@ const AddEditBook = () => {
                   type="text"
                   className={`form-control ${error.publisher ? 'is-invalid' : ''}`}
                   placeholder="Enter publisher name"
-                  value={formdata.publisher}
-                  onChange={(e) => setFormData({
-                    ...formdata, publisher: e.target.value.replace(/[^a-zA-Z\s.]/g, ''),
-                  })}
+                  value={formData.publisher}
+                  onChange={(e) => handleChange('publisher', e.target.value)}
                 />
                 {error.publisher && <div className="invalid-feedback">{error.publisher}</div>}
               </div>
@@ -156,9 +153,9 @@ const AddEditBook = () => {
                   id="publishDate"
                   type="date"
                   className={`form-control ${error.publishDate ? 'is-invalid' : ''}`}
-                  value={formdata.publishDate?.split("T")[0]}
+                  value={formData.publishDate?.split("T")[0]}
                   onChange={(e) =>
-                    setFormData({ ...formdata, publishDate: e.target.value })
+                    setFormData({ ...formData, publishDate: e.target.value })
                   }
                 />
 
@@ -172,8 +169,8 @@ const AddEditBook = () => {
                   className="form-control"
                   placeholder="Enter book overview/description"
                   rows="4"
-                  value={formdata.overview}
-                  onChange={(e) => setFormData({ ...formdata, overview: e.target.value })}
+                  value={formData.overview}
+                  onChange={(e) => setFormData({ ...formData, overview: e.target.value })}
                 />
                 <div className="form-text">Optional: Provide a brief description of the book</div>
               </div>
@@ -197,4 +194,4 @@ const AddEditBook = () => {
 
 };
 
-export default AddEditBook;
+export default React.memo(AddEditBook);
