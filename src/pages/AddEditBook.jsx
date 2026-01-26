@@ -53,7 +53,6 @@ const AddEditBook = () => {
     }));
   }, []);
 
-  /* ================= VALIDATION ================= */
   const validate = useCallback(() => {
     const newErrors = {};
 
@@ -68,7 +67,6 @@ const AddEditBook = () => {
     return Object.keys(newErrors).length === 0;
   }, [formData]);
 
-  /* ================= SUBMIT ================= */
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
@@ -86,7 +84,7 @@ const AddEditBook = () => {
           await api.post("/createbook", payload);
         }
 
-        await fetchBooks(); // 🔥 refresh navbar count
+        await fetchBooks();
         navigate("/");
       } catch (err) {
         console.error("Submit error:", err);
@@ -175,7 +173,6 @@ const AddEditBook = () => {
                 <div className="form-text">Optional: Provide a brief description of the book</div>
               </div>
 
-              {/* Submit Button */}
               <div className="d-grid gap-2 d-md-flex justify-content-md-end">
                 <button
                   type="submit"

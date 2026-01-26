@@ -4,7 +4,6 @@ import api from "../services/api";
 import "../styles/main.css";
 import Navbar from "../components/Navbar";
 
-// Debounce hook
 const useDebounce = (value, delay) => {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
@@ -22,7 +21,6 @@ const Home = () => {
 
   const booksPerPage = 10;
 
-  // Fetch all books
   const fetchBooks = useCallback(async () => {
     try {
       const res = await api.get("/allbook");
@@ -39,29 +37,25 @@ const Home = () => {
     fetchBooks();
   }, [fetchBooks]);
 
-  // Optimistic delete
   const handleDelete = useCallback(
     async (id) => {
       const confirmDelete = window.confirm("Are you sure you want to delete this book?");
       if (!confirmDelete) return;
 
-      // Remove from UI immediately
       setBook((prev) => prev.filter((b) => b._id !== id));
 
       try {
         await api.delete(`/delete-book/${id}`);
       } catch (error) {
         alert("Delete failed. Restoring book...");
-        fetchBooks(); // restore if error
+        fetchBooks(); 
       }
     },
     [fetchBooks]
   );
 
-  // Debounced search
   const debouncedSearch = useDebounce(search, 300);
 
-  // Filter books
   const filteredBooks = useMemo(() => {
     if (!Array.isArray(book)) return [];
     const query = debouncedSearch.toLowerCase();
@@ -72,12 +66,10 @@ const Home = () => {
     );
   }, [book, debouncedSearch]);
 
-  // Pagination
   const indexOfLast = currentPage * booksPerPage;
   const indexOfFirst = indexOfLast - booksPerPage;
   const currentBooks = filteredBooks.slice(indexOfFirst, indexOfLast);
 
-  // Memoized table rows
   const renderedRows = useMemo(
     () =>
       currentBooks.map((book) => (
@@ -133,7 +125,7 @@ const Home = () => {
       <div className="row mb-4  ">
         <div className="col-12">
           <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3 mb-md-4">
-            <div></div> {/* Empty div to push button right */}
+            <div></div>
             <Link to="/add-book" className="text-decoration-none">
               <button className="btn btn-primary d-flex align-items-center">
                 <i className="bi bi-plus-circle pe-2"></i> Add New Book
@@ -211,7 +203,6 @@ const Home = () => {
                 </table>
               </div>
 
-              {/* Pagination */}
               {book.length > 0 && (
                 <div className="d-flex justify-content-center border-top pt-3">
                   <nav aria-label="Page navigation">

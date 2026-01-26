@@ -12,8 +12,8 @@ const BoockDetails = () => {
 
    const fetchBookDetails = async () => {
     try {
-      const res = await api.get(`/books/${id}`); // call backend directly
-      setBook(res.data); // store book in state
+      const res = await api.get(`/books/${id}`); 
+      setBook(res.data);
     } catch (error) {
       console.error("Error fetching book details", error);
     } finally {
