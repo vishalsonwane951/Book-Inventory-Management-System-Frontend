@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import "../styles/main.css";
 import Navbar from "../components/Navbar";
@@ -18,6 +18,8 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const navigate = useNavigate();
+  
 
   const booksPerPage = 10;
 
@@ -38,21 +40,20 @@ const Home = () => {
   }, [fetchBooks]);
 
   const handleDelete = useCallback(
-    async (id) => {
-      const confirmDelete = window.confirm("Are you sure you want to delete this book?");
-      if (!confirmDelete) return;
+  async (id) => {
+    if (!window.confirm("Are you sure you want to delete this book?")) return;
 
-      setBook((prev) => prev.filter((b) => b._id !== id));
+    try {
+      await api.delete(`/delete-book/${id}`);
+      await fetchBooks();   
+      navigate("/");       
+    } catch (error) {
+      alert("Delete failed. Please try again.");
+    }
+  },
+  [fetchBooks, navigate]
+);
 
-      try {
-        await api.delete(`/delete-book/${id}`);
-      } catch (error) {
-        alert("Delete failed. Restoring book...");
-        fetchBooks(); 
-      }
-    },
-    [fetchBooks]
-  );
 
   const debouncedSearch = useDebounce(search, 300);
 

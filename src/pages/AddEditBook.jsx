@@ -40,7 +40,6 @@ const AddEditBook = () => {
     fetchBook();
   }, [id]);
 
-  /* ================= INPUT HANDLER ================= */
   const handleChange = useCallback((field, value) => {
     const cleanValue =
       field === "author"

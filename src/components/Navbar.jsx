@@ -1,6 +1,7 @@
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import React, { useState,useEffect, useContext } from "react";
 import { BookContext } from "../context/BookContext";
+
 
 const Navbar = () => {
   const [expanded, setExpanded] = useState(false);
@@ -20,7 +21,7 @@ const Navbar = () => {
       </div>
 
 
-      <nav className="navbar navbar-expand-lg border-bottom" style={{ background: "white" }}>
+       <nav className="navbar navbar-expand-lg border-bottom" style={{ background: "white" }}>
         <div className="container-fluid px-4">
           <Link className="navbar-brand fw-bold d-flex align-items-center gap-2" to="/">
             <div className="rounded bg-primary p-2">
@@ -36,10 +37,9 @@ const Navbar = () => {
           <div className={`collapse navbar-collapse ${expanded ? 'show' : ''}`}>
             <div className="navbar-nav me-auto">
               <Link className="nav-link px-3" to="/">
-                <i className="bi bi-house me-1"></i>
-                Home
-              </Link>
-
+  <i className="bi bi-house-door me-1 text-primary fs-6"></i>
+  Home
+</Link>
 
               <Link className="nav-link px-3" to="/add-book">
                 <i className="bi bi-plus-circle me-1"></i>
@@ -50,7 +50,7 @@ const Navbar = () => {
             </div>
           </div>
         </div>
-      </nav>
+      </nav> 
     </>
   );
 };
