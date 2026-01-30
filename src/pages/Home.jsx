@@ -2,8 +2,6 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import "../styles/main.css";
-import Navbar from "../components/Navbar";
-
 const useDebounce = (value, delay) => {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
@@ -119,7 +117,19 @@ const Home = () => {
   );
 
   if (loading)
-    return <p style={{ padding: "20px", textAlign: "center" }}>Loading...</p>;
+    return (
+  <div className="container py-5">
+        <div className="row justify-content-center">
+          <div className="col-md-8 text-center">
+            <div className="spinner-border text-primary" role="status" style={{ width: '3rem', height: '3rem' }}>
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            <h4 className="mt-3">Loading Books...</h4>
+            <p className="text-muted">Please wait while we fetch the book information.</p>
+          </div>
+        </div>
+      </div>
+    );
 
   return (
     <>
