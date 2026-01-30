@@ -21,7 +21,7 @@ const Home = () => {
 
   const booksPerPage = 10;
 
-  const fetchBooks = useCallback(async () => {
+  const fetchBooks = async () => {
     try {
       const res = await api.get("/allbook");
       setBook(res.data);
@@ -31,7 +31,7 @@ const Home = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
   useEffect(() => {
     fetchBooks();
@@ -62,7 +62,8 @@ const Home = () => {
     return book.filter(
       (b) =>
         b.title?.toLowerCase().includes(query) ||
-        b.author?.toLowerCase().includes(query)
+        b.author?.toLowerCase().includes(query) ||
+        b.publisher?.toLowerCase().includes(query)
     );
   }, [book, debouncedSearch]);
 
