@@ -80,7 +80,7 @@ const Home = () => {
           <td className="d-none d-md-table-cell">{book.publisher}</td>
           <td className="d-none d-lg-table-cell">
             {book.publishDate ? (
-              <span className="badge bg-light text-dark">{book.publishDate}</span>
+              <span className="badge bg-light text-dark">{book.publishDate.split('T')[0]}</span>
             ) : (
               <span className="text-muted">Not specified</span>
             )}
