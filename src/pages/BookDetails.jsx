@@ -38,7 +38,7 @@ const BoockDetails = () => {
 
       <p><strong>Author:</strong> {book.author}</p>
       <p><strong>Publisher:</strong> {book.publisher}</p>
-      <p><strong>Published Date:</strong> {book.publishDate}</p>
+      <p><strong>Published Date:</strong> {book.publishDate ? book.publishDate.split('T')[0] : 'not specified'}</p>
 
       <div style={{ marginTop: "15px" }}>
         <strong>Overview:</strong>
